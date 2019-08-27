@@ -1,0 +1,7 @@
+workflow-aggregator:latest
+configuration-as-code:latest
+job-dsl:latest
+timestamper:latest
+git:latest
+pipeline-stage-view:latest
+build-timeout:latest

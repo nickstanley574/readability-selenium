@@ -1,0 +1,30 @@
+jenkins:
+  systemMessage: "Configured automatically with JCasC plugin\n\n"
+  numExecutors: 1
+tool:
+  git:
+    installations:
+    - home: "git"
+      name: "Default"
+jobs:
+  - script: >
+      pipelineJob('pipeline') {
+        parameters {
+          stringParam('BRANCH', 'master')        
+        }
+        definition {
+          cpsScm {
+            scriptPath 'Jenkinsfile'
+            scm {
+              git {
+                remote { url 'git@github.com:mattblaha/readability-selenium.git' }
+                branch '$BRANCH'
+              }
+            }
+          }
+        }
+      }
+  - script: > 
+      job('example') {
+        description('My first job')
+      }

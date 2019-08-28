@@ -8,8 +8,6 @@ pipeline {
             steps {
                 echo 'Building..'
                 sh './setup.sh'
-
-                }
             }
         }
         stage('Test') {

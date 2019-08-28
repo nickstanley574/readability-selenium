@@ -12,19 +12,18 @@ jobs:
         parameters {
           stringParam('BRANCH', 'master')        
         }
+        parameters {
+          stringParam('URL')        
+        }
         definition {
           cpsScm {
-            scriptPath 'Jenkinsfile'
+            scriptPath 'jenkins/Jenkinsfile'
             scm {
               git {
-                remote { url 'git@github.com:mattblaha/readability-selenium.git' }
+                remote { url '$URL' }
                 branch '$BRANCH'
               }
             }
           }
         }
-      }
-  - script: > 
-      job('example') {
-        description('My first job')
       }

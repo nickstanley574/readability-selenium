@@ -8,16 +8,16 @@ tool:
       name: "Default"
 jobs:
   - script: >
-      pipelineJob('pipeline') {
+      pipelineJob('readability-selenium') {
         parameters {
           stringParam('BRANCH', 'master')        
         }
         parameters {
-          stringParam('URL')        
+          stringParam('URL', 'https://github.com/nickstanley574/readability-selenium.git')
         }
         definition {
           cpsScm {
-            scriptPath 'jenkins/Jenkinsfile'
+            scriptPath 'Jenkinsfile'
             scm {
               git {
                 remote { url '$URL' }

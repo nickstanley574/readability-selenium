@@ -5,3 +5,5 @@ timestamper:latest
 git:latest
 pipeline-stage-view:latest
 build-timeout:latest
+ws-cleanup:latest
+rebuild:latest

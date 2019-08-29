@@ -19,4 +19,10 @@ pipeline {
             }
         }
     }
+    post {
+        always {
+            // Recursively delete the current directory from the workspace
+            deleteDir()
+        }
+    }
 }

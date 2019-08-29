@@ -13,6 +13,7 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Testing...'
+                sh 'pwd;ls'
                 sh '#!/bin/bash source venv/bin/activate'
                 sh 'which python'
                 sh 'python -m unittest discover'

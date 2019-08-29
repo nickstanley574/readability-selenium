@@ -6,17 +6,16 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                echo 'Building..'
                 sh './setup.sh'
             }
         }
-        stage('Test') {
+        stage('UnitTests') {
             steps {
-                echo 'Testing...'
-                sh 'pwd;ls; ls -al  venv/'
-                sh '#!/bin/bash source venv/bin/activate'
-                sh 'which python'
-                sh 'python -m unittest discover'
+                sh '''#!/bin/bash
+                    source venv/bin/activate
+                    which python
+                    python -m unittest discover
+                '''
             }
         }
     }

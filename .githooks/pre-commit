@@ -1,4 +1,0 @@
-#!/bin/bash
-echo "[pre-commit] Running  unit tests ..."
-./venv/bin/python -m unittest discover
-

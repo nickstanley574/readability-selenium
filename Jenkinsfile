@@ -10,6 +10,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh './setup.sh'
+                sh 'sleep 30' //builds are going to fast to test jenkins cocurrent build check this will be removed
             }
         }
         stage('UnitTests') {

@@ -1,8 +1,9 @@
 version: '3'
 services:
-  jenkins:
+  readability-selenium:
     build: .
     volumes:
       - ./jenkins-data:/var/jenkins_home
+      - ../.:/mnt/localrepo:ro
     ports:
       - 8081:8080

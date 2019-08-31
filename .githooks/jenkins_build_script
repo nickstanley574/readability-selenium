@@ -1,0 +1,64 @@
+ #!/bin/bash
+
+JENKINS_URL=localhost
+PORT=8081
+argsArray=("$@")
+JOB=readability-selenium
+JOBURL=$JENKINS_URL:$PORT/job/$JOB
+BRANCH=$(git branch | grep \* | cut -d ' ' -f2)
+echo "BRANCH: $BRANCH"
+PARAMS="BRANCH=$BRANCH"
+
+# Run a curl against the Jenkins instance
+STATUS_CODE=""
+printf "waiting for jenkins server: http://$JENKINS_URL:$PORT..."
+while [ "$STATUS_CODE" != 200 ]; do
+  sleep 3
+  printf "."
+  STATUS_CODE=$(curl -sL -w "%{http_code}" $JENKINS_URL:$PORT -o /dev/null --max-time 15)
+done
+printf "\n"
+
+# Trggier Build 
+TRIGGER_RESPONSE=`curl -s -D - --data "$PARAMS" --request POST "http://$JENKINS_URL:$PORT/job/$JOB/buildWithParameters"`
+QUEUE_ID=`echo "$TRIGGER_RESPONSE" | grep Location | cut -d "/" -f 6`
+QUEUE_URL="http://$JENKINS_URL:$PORT/queue/item/${QUEUE_ID}/api/json?pretty=true"
+
+# Wait for queue 
+printf "waiting for queue..."
+while curl -v $QUEUE_URL 2>&1 | egrep -q "BlockedItem|WaitingItem"; do
+    printf "."
+    sleep 5
+done
+printf "\n"
+
+# Make sure job started correctly 
+JOB_ID=$(curl -s "$QUEUE_URL" | jq --raw-output '.executable.number')
+JOB_URL=$(curl -s "$QUEUE_URL" | jq --raw-output '.executable.url')
+if [ -z "$JOB_ID" ]; then
+    echo "Error creating job."
+    exit 1
+fi
+echo "Jenkins job $JOB_ID created, waiting to complete: $JOB_URL..."
+STATUS=""
+while [ "$STATUS" != 200 ]; do
+  sleep 1
+  STATUS=`curl -s -o /dev/null -w "%{http_code}" "${JOB_URL}"consoleText`
+done
+
+# Wait until job is done running 
+JOBURLJSON="$JOB_URL"api/json?pretty=true
+RUNNING=$(curl -s "$JOBURLJSON" | jq --raw-output '.building')
+printf "running..."
+while $RUNNING; do
+    printf "."
+    RUNNING=$(curl -s "$JOBURLJSON" | jq --raw-output '.building')
+    sleep 5
+done
+printf "\n"
+
+# Check status of job and exits
+JOBSTATUS=$(curl -s "$JOBURLJSON" | jq --raw-output '.result')
+echo "Job $JOB_ID finished with status: $JOBSTATUS"
+
+[[ "$JOBSTATUS" == "SUCCESS" ]]

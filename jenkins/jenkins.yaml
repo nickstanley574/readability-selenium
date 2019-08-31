@@ -10,10 +10,10 @@ jobs:
   - script: >
       pipelineJob('readability-selenium') {
         parameters {
-          stringParam('BRANCH', 'master')        
+          stringParam('BRANCH')        
         }
         parameters {
-          stringParam('URL', 'https://github.com/nickstanley574/readability-selenium.git')
+          stringParam('URL', '/mnt/localrepo')
         }
         definition {
           cpsScm {

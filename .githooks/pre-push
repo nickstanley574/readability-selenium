@@ -1,16 +1,21 @@
 #!/bin/bash
-protected_branch='master'
-current_branch=$(git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
 
-if [ $protected_branch = $current_branch ]
-then
-	read -p "You're about to push to master. What's the meaning of life? > " -n 2 -r < /dev/tty
-    if echo $REPLY | grep -E '42' > /dev/null
-    then
-    	exit 0 # carry on
-    fi
-	echo "fail aborting ..."
-    exit 1 # exit and go read a book
-else
-    exit 0
-fi
+bold=$(tput bold)
+normal=$(tput sgr0)
+
+echo "${bold}[pre-push] Pulling in latest changes from master...${normal}"
+git pull origin master
+
+echo "${bold}[pre-push] setting up jenkins docker container...${normal}"
+cd jenkins/
+sudo docker-compose down
+sudo docker-compose build
+sudo docker-compose up -d 
+sleep 5 # Give Jenkins a second to start
+echo "${bold}[pre-push] running jenkins_build_script...${normal}"
+../.githooks/jenkins_build_script
+EXIT=$?
+
+echo "${bold}[pre-push] Tearing down jenkins...${normal}"
+sudo docker-compose down
+exit $EXIT

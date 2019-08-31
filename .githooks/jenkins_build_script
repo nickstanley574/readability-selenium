@@ -1,28 +1,27 @@
  #!/bin/bash
 
-JENKINS_URL=localhost
+JENKINS=localhost
 PORT=8081
-argsArray=("$@")
+JENKINS_URL=$JENKINS:$PORT
 JOB=readability-selenium
-JOBURL=$JENKINS_URL:$PORT/job/$JOB
 BRANCH=$(git branch | grep \* | cut -d ' ' -f2)
-echo "BRANCH: $BRANCH"
 PARAMS="BRANCH=$BRANCH"
+echo "branch: $BRANCH"
 
 # Run a curl against the Jenkins instance
 STATUS_CODE=""
-printf "waiting for jenkins server: http://$JENKINS_URL:$PORT..."
+printf "waiting for jenkins server: http://$JENKINS_URL..."
 while [ "$STATUS_CODE" != 200 ]; do
   sleep 3
   printf "."
-  STATUS_CODE=$(curl -sL -w "%{http_code}" $JENKINS_URL:$PORT -o /dev/null --max-time 15)
+  STATUS_CODE=$(curl -sL -w "%{http_code}" $JENKINS_URL -o /dev/null --max-time 15)
 done
 printf "\n"
 
 # Trggier Build 
-TRIGGER_RESPONSE=`curl -s -D - --data "$PARAMS" --request POST "http://$JENKINS_URL:$PORT/job/$JOB/buildWithParameters"`
+TRIGGER_RESPONSE=`curl -s -D - --data "$PARAMS" --request POST "http://$JENKINS_URL/job/$JOB/buildWithParameters"`
 QUEUE_ID=`echo "$TRIGGER_RESPONSE" | grep Location | cut -d "/" -f 6`
-QUEUE_URL="http://$JENKINS_URL:$PORT/queue/item/${QUEUE_ID}/api/json?pretty=true"
+QUEUE_URL="http://$JENKINS_URL/queue/item/${QUEUE_ID}/api/json?pretty=true"
 
 # Wait for queue 
 printf "waiting for queue..."

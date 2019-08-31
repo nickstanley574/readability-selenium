@@ -13,7 +13,7 @@ sudo docker-compose build
 sudo docker-compose up -d 
 sleep 5 # Give Jenkins a second to start
 echo "${bold}[pre-push] running jenkins_build_script...${normal}"
-../.githooks/jenkins_build_script
+../.githooks/jenkins_build
 EXIT=$?
 
 echo "${bold}[pre-push] Tearing down jenkins...${normal}"
